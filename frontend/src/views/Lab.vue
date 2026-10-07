@@ -145,7 +145,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 const params = reactive({
   page: 1,
   pageSize: 10,
-  keywords: ''
+  keyword: ''
 })
 const loading = ref(false)
 const tableData = ref([])
@@ -246,7 +246,7 @@ const load = async () => {
     const res = await getLabPageList({
       page: params.page,
       page_size: params.pageSize,
-      keywords: params.keywords
+      keyword: params.keyword
     })
     if (res.code === 200) {
       tableData.value = res.data?.items ?? []

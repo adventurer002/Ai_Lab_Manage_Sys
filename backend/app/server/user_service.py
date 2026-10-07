@@ -29,6 +29,7 @@ async def update_user_info_service(
     for k, v in user_dict.items():
         setattr(user, k, v)
     await db.commit()
+    await db.refresh(user)
     return UserResponse.model_validate(user)
 
 

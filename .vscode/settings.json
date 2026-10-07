@@ -1,0 +1,16 @@
+{
+  "python.analysis.autoImportCompletions": true,
+  "python.languageServer": "Pylance",
+  "python.analysis.extraPaths": ["./backend"],
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
+}

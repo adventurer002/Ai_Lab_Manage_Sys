@@ -38,7 +38,7 @@ async def register_judge(data: RegisterRequest, db: AsyncSession) -> None:
         password=hash_password(data.password),
         name=data.name or data.username,
         status=1,
-        role="student",
+        role="学生",
     )
     db.add(user)
     await db.commit()

@@ -81,25 +81,30 @@
         v-loading="loading"
       >
         <el-form-item label="账号" prop="username">
-          <el-input :disabled="!!form.id" v-model="form.username" placeholer="请输入账号" />
+          <el-input :disabled="!!form.id" v-model="form.username" placeholder="请输入账号" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input type="password" show-password v-model="form.password" placeholer="请输入密码" />
+          <el-input
+            type="password"
+            show-password
+            v-model="form.password"
+            placeholder="请输入密码"
+          />
         </el-form-item>
         <el-form-item label="名称" prop="name">
-          <el-input v-model="form.name" placeholer="请输入名称" />
+          <el-input v-model="form.name" placeholder="请输入名称" />
         </el-form-item>
         <el-form-item label="角色" prop="role">
           <el-select v-model="form.role">
-            <el-option label="学生" value="student"></el-option>
-            <el-option label="管理员" value="admin"></el-option>
+            <el-option label="学生" value="学生"></el-option>
+            <el-option label="管理员" value="管理员"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholer="请输入邮箱" />
+          <el-input v-model="form.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="form.phone" placeholer="请输入手机号" />
+          <el-input v-model="form.phone" placeholder="请输入手机号" />
         </el-form-item>
         <el-form-item label="状态">
           <el-radio-group v-model="form.status">
@@ -134,7 +139,7 @@ const formRef = ref()
 const form = reactive({
   username: '',
   name: '',
-  role: 'student',
+  role: '学生',
   email: '',
   phone: '',
   avatar: '',
@@ -168,7 +173,7 @@ const resetForm = () => {
     id: null,
     username: '',
     name: '',
-    role: 'student',
+    role: '学生',
     email: '',
     phone: '',
     avatar: '',

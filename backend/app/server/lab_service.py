@@ -12,17 +12,28 @@ from app.schemas.lab import (
 
 # 查询实验室列表
 async def get_lab_list_service(
-    db: AsyncSession, page: int, page_size: int, keyword: str | None = None
+    db: AsyncSession,
+    page: int,
+    page_size: int,
+    keyword: str | None = None,
+    status: int | None = None,
 ) -> QueryResponse:
-
     # 跳过多少条数据
     skip = (page - 1) * page_size
-    stmt = select(Lab).order_by(Lab.id.asc()).offset(skip).limit(page_size)
+    stmt = (
+        select(Lab)
+        .order_by(Lab.status.asc(), Lab.id.asc())
+        .offset(skip)
+        .limit(page_size)
+    )
     count_stmt = select(func.count(Lab.id))
     if keyword:
-        condition = Lab.name.contains(keyword)
+        condition = Lab.name.contains(keyword) | Lab.location.contains(keyword)
         stmt = stmt.where(condition)
         count_stmt = count_stmt.where(condition)
+    if status is not None:
+        stmt = stmt.where(Lab.status == status)
+        count_stmt = count_stmt.where(Lab.status == status)
     query = await db.execute(stmt)
     labs = query.scalars().all()
     total = await db.execute(count_stmt)
@@ -30,6 +41,14 @@ async def get_lab_list_service(
         items=[LabResponse.model_validate(lab) for lab in labs],
         total=total.scalar(),
     )
+
+
+# 查询实验室详情
+async def get_lab(db: AsyncSession, lab_id: int):
+    lab = (await db.execute(select(Lab).where(Lab.id == lab_id))).scalar_one_or_none()
+    if not lab:
+        raise BusinessException(message="实验室不存在")
+    return LabResponse.model_validate(lab)
 
 
 # 管理员创建实验室

@@ -54,5 +54,7 @@ async def get_current_user(
 # 管理用户依赖
 async def judge_manager(user: Annotated[User, Depends(get_current_user)]):
     if user.role != "管理员":
-        raise BaseException("非管理员用户")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="非管理员用户"
+        )
     return user

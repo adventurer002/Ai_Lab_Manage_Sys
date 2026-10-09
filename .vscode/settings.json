@@ -1,4 +1,12 @@
 {
+  "cSpell.words": [
+    "selectinload",
+    "joinedload",
+    "sqlalchemy",
+    "pydantic",
+    "uvicorn",
+    "lablist"
+  ],
   "python.analysis.autoImportCompletions": true,
   "python.languageServer": "Pylance",
   "python.analysis.extraPaths": ["./backend"],

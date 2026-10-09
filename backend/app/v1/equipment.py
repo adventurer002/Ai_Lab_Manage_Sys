@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from app.model.user import User
-from app.dependencies.auth import judge_manager
+from app.dependencies.auth import get_current_user, judge_manager
 from app.common.response import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.equipment import EquipmentCreateRequest, EquipmentUpdateRequest
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/equipment", tags=["实验室设备信息接口"])
 @router.get("/list")
 async def GetEquipmentList(
     db: Annotated[AsyncSession, Depends(get_async_session)],
-    current_manager: Annotated[User, Depends(judge_manager)],
+    current_user: Annotated[User, Depends(get_current_user)],
     page: int = 1,
     page_size: int = 10,
     keyword: str | None = None,

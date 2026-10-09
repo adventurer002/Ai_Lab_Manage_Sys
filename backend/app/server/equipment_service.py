@@ -31,7 +31,7 @@ async def get_equipment_list_service(
         .limit(page_size)
     )
     count_stmt = select(func.count(Equipment.id))
-    if lab_id:
+    if lab_id is not None:
         stmt = stmt.where(Equipment.lab_id == lab_id)
         count_stmt = count_stmt.where(Equipment.lab_id == lab_id)
     if keyword:

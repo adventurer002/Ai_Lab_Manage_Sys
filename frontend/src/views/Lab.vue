@@ -7,7 +7,7 @@
       <div style="margin-bottom: 10px">
         <el-input
           placeholder="请输入名称或位置查询"
-          v-model="params.keywords"
+          v-model="params.keyword"
           style="width: 240px; margin-right: 8px"
           clearable
           @keyup.enter="handleSearch"
@@ -82,7 +82,7 @@
           <el-upload
             :http-request="handleFileUpload"
             :show-file-list="false"
-            accept="img/jpeg,img/png,img/gif,img/webp"
+            accept="image/jpeg,image/png,image/gif,image/webp"
           >
             <img
               v-if="form.img"

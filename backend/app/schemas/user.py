@@ -38,5 +38,5 @@ class UserCreateRequest(BaseModel):
     email: str | None = None
     phone: str | None = None
     avatar: str | None = None
-    role: str = "student"
+    role: str = "学生"
     status: int = 1

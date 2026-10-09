@@ -4,6 +4,8 @@ from .user import router as user_router
 from .file import router as file_router
 from .lab import router as lab_router
 from .equipment import router as equipment_router
+from .reservation import router as reservation_router
+from .chat import router as chat_router
 
 
 v1 = APIRouter(prefix="/v1")
@@ -12,3 +14,5 @@ v1.include_router(user_router)
 v1.include_router(file_router)
 v1.include_router(lab_router)
 v1.include_router(equipment_router)
+v1.include_router(reservation_router)
+v1.include_router(chat_router)

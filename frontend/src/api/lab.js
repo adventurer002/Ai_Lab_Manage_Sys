@@ -34,3 +34,14 @@ export function deleteLabApi(labId) {
     method: 'delete'
   })
 }
+/**
+ * 根据ID查询实验室详情
+ * @param {Number} lab_id
+ * @returns
+ */
+export function getLab(lab_id) {
+  return request({
+    url: `/v1/lab/${lab_id}`,
+    method: 'get'
+  })
+}

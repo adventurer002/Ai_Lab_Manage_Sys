@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI, HTTPException
 from app.v1 import v1
 from app.database import create_table, async_engine
@@ -12,13 +14,16 @@ from app.common.exceptions import (
 )
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from app.server.reservation_service import run_expire
 from app.config import FILE_PATH
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await create_table()
+    expire_task = asyncio.create_task(run_expire())
     yield
+    expire_task.cancel()
     await async_engine.dispose()
     print("数据库引擎已关闭")
 

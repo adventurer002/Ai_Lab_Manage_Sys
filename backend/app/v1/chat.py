@@ -1,17 +1,56 @@
-from fastapi import APIRouter
+import json
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.ai import ChatMessage
 from app.schemas.ai import ChatRequest
-from app.server.ai_service import chat_service
-from app.common.exceptions import BusinessException
+from app.server import agent_service
 from app.common.response import Response
+from app.database import get_async_session
+from app.dependencies.auth import get_current_user
+from app.model.user import User
 
 
 router = APIRouter(prefix="/ai")
 
 
 @router.post("/chat")
-async def chat(data: ChatRequest):
+async def chat(
+    data: ChatRequest,
+    db: Annotated[AsyncSession, Depends(get_async_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
     """调用模型"""
-    content = await chat_service(data)
+    content = await agent_service.run_agent(db, current_user, data)
     return Response.success(data=ChatMessage(role="assistant", content=content))
+
+
+def _sse_line(payload: dict) -> str:
+    """拼一条 SSE 帧：必须以 data: 开头，且以空行（\n\n）结束。"""
+    # ensure_ascii=False：中文不要被转成 \uXXXX
+    return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
+@router.post("/chat/stream")
+async def chat_stream(
+    data: ChatRequest,
+    db: Annotated[AsyncSession, Depends(get_async_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    async def event_gen():
+        # 内层异步生成器：取出业务事件，包装成 SSE 文本再往外 yield
+        async for event in agent_service.stream_agent(db, current_user, data):
+            yield _sse_line(event)
+
+    return StreamingResponse(
+        event_gen(),
+        media_type="text/event-stream",  # 告诉浏览器这是 SSE 流
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # 有 Nginx 时避免缓冲整段再吐
+        },
+    )

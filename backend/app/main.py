@@ -7,20 +7,23 @@ from contextlib import asynccontextmanager
 from fastapi.exceptions import RequestValidationError
 from app.common.exceptions import (
     BusinessException,
-    bussiness_excpetion_hadler,
-    http_excpetion_hadler,
-    validation_excpetion_hadler,
-    global_excpetion_hadler,
+    business_exception_handler,
+    global_exception_handler,
+    http_exception_handler,
+    validation_exception_handler,
 )
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.server.reservation_service import run_expire
+from app.server.kb_service import warmup
 from app.config import FILE_PATH
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await create_table()
+    # 预热向量库模型，把首次加载的约 30s 开销付在启动阶段
+    await warmup()
     expire_task = asyncio.create_task(run_expire())
     yield
     expire_task.cancel()
@@ -45,11 +48,11 @@ app.add_middleware(
 )
 
 # 注册异常处理器
-app.add_exception_handler(BusinessException, bussiness_excpetion_hadler)
-app.add_exception_handler(HTTPException, http_excpetion_hadler)
-app.add_exception_handler(RequestValidationError, validation_excpetion_hadler)
-# 全局的异常兜底，必须放在最后注册！！
-app.add_exception_handler(Exception, global_excpetion_hadler)
+app.add_exception_handler(BusinessException, business_exception_handler)
+app.add_exception_handler(HTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+# 全局的异常兜底，必须放在最后注册
+app.add_exception_handler(Exception, global_exception_handler)
 
 # 静态文件服务
 app.mount("/uploads", StaticFiles(directory=FILE_PATH), name="uploads")

@@ -17,4 +17,6 @@ dependencies = [
     "openai>=3.26.1",
     "chromadb>=1.5.9",
     "sentence-transformers>=6.1.0",
+    "langgraph>=1.2.14",
+    "langchain-openai>=1.7.0",
 ]

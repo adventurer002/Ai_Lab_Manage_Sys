@@ -10,8 +10,8 @@ from app.config import settings
 # 创建异步数据库引擎
 async_engine = create_async_engine(
     settings.DATABASE_URL,
-    echo=True,  # 打印sql日志
-    future=True,  # 开启异步模式
+    echo=False,  # 生产环境关闭 SQL 日志，避免泄露数据
+    future=True,
     pool_size=10,
     max_overflow=20,
 )

@@ -199,7 +199,7 @@ async def expire_pending_reservation_service(db: AsyncSession):
     try:
         now = datetime.now()
         date = now.strftime("%Y-%m-%d")
-        time = now.strftime("%H:%M")
+        current_time_str = now.strftime("%H:%M")
         Change = False
         items_res = await db.execute(
             select(Reservation).where(
@@ -208,7 +208,7 @@ async def expire_pending_reservation_service(db: AsyncSession):
         )
         items = items_res.scalars().all()
         for item in items:
-            if item.date < date or (item.date == date and item.end_time < time):
+            if item.date < date or (item.date == date and item.end_time < current_time_str):
                 item.status = 3
                 Change = True
         if Change:

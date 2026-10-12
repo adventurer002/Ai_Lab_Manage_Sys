@@ -21,7 +21,7 @@ class Reservation(Base):
     end_time: Mapped[str] = mapped_column(String(20), comment="结束时间")
     remark: Mapped[str | None] = mapped_column(String(255), comment="备注")
     status: Mapped[int] = mapped_column(
-        comment="预约状态 0待审核 1已通过 2已拒绝 3已取消", default=0
+        comment="预约状态 0待审核 1已通过 2已拒绝 3已取消 4已过期", default=0
     )
 
     user: Mapped[User] = relationship()

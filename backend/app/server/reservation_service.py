@@ -173,6 +173,25 @@ async def cancel_reservation_service(
     await db.refresh(item)
 
 
+# delete 删除预约
+async def delete_reservation_service(
+    db: AsyncSession, current_user: User, reservation_id: int
+):
+    """删除预约（仅本人或管理员可删除已取消/已过期的记录）"""
+    item_res = await db.execute(
+        select(Reservation).where(Reservation.id == reservation_id)
+    )
+    item = item_res.scalar_one_or_none()
+    if not item:
+        raise BusinessException(message="预约记录不存在")
+    if item.user_id != current_user.id and current_user.role != "管理员":
+        raise BusinessException(message="无权限", code=403)
+    if item.status not in [3, 4]:
+        raise BusinessException(message="仅已取消或已过期的预约可删除")
+    await db.delete(item)
+    await db.commit()
+
+
 # audit 审核预约
 
 
@@ -193,9 +212,9 @@ async def audit_reservation_service(db: AsyncSession, reservation_id: int, statu
     await db.refresh(item)
 
 
-# 超时取消
-async def expire_pending_reservation_service(db: AsyncSession):
-    """超时取消预约"""
+# 超时处理
+async def expire_outdated_reservation_service(db: AsyncSession):
+    """超时处理预约：待审核→已取消，已通过→已过期"""
     try:
         now = datetime.now()
         date = now.strftime("%Y-%m-%d")
@@ -203,13 +222,16 @@ async def expire_pending_reservation_service(db: AsyncSession):
         Change = False
         items_res = await db.execute(
             select(Reservation).where(
-                Reservation.status == 0,
+                Reservation.status.in_([0, 1]),
             )
         )
         items = items_res.scalars().all()
         for item in items:
-            if item.date < date or (item.date == date and item.end_time < current_time_str):
-                item.status = 3
+            if item.date < date or (
+                item.date == date and item.end_time < current_time_str
+            ):
+                # 待审核超时未处理 → 已取消；已通过但已过点 → 已过期
+                item.status = 3 if item.status == 0 else 4
                 Change = True
         if Change:
             await db.commit()
@@ -218,11 +240,11 @@ async def expire_pending_reservation_service(db: AsyncSession):
 
 
 async def run_expire():
-    """超时取消预约"""
+    """超时处理预约"""
     while True:
         try:
             async with AsyncSessionLocal() as db:
-                await expire_pending_reservation_service(db)
+                await expire_outdated_reservation_service(db)
         except Exception as e:
             print(e)
         await asyncio.sleep(60)

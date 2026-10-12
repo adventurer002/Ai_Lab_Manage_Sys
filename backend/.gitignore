@@ -9,3 +9,6 @@ uploads/
 
 # Virtual environments
 .venv
+
+# Environment variables（含密钥，不入库；模板见 .env.example）
+.env

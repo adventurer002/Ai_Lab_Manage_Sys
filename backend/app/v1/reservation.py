@@ -52,6 +52,19 @@ async def cancel_reservation(
     return Response.success()
 
 
+# 删除预约（仅已取消或已过期）
+@router.delete("/{reservation_id}")
+async def delete_reservation(
+    reservation_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_async_session)],
+):
+    await reservation_service.delete_reservation_service(
+        db, current_user, reservation_id
+    )
+    return Response.success()
+
+
 # audit审查预约
 @router.put("/{reservation_id}/audit")
 async def audit_reservation(

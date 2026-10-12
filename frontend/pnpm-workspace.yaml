@@ -1,0 +1,14 @@
+allowBuilds:
+  '@parcel/watcher': true
+  '@tailwindcss/oxide': true
+  core-js: true
+  es5-ext: true
+  esbuild: true
+  vue-demi: true
+onlyBuiltDependencies:
+  - esbuild
+  - '@tailwindcss/oxide'
+  - '@parcel/watcher'
+  - vue-demi
+  - core-js
+  - es5-ext
